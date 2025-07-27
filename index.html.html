@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QuickPass - Hızlı Şifre Üretici</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #1e1e1e;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #0ff;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 15px;
+      color: #0ff;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px 0;
+      text-align: left;
+    }
+    input[type=range] {
+      width: 100%;
+    }
+    input[type=checkbox] {
+      margin-right: 8px;
+      transform: scale(1.2);
+      vertical-align: middle;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px 25px;
+      background: #0ff;
+      border: none;
+      border-radius: 6px;
+      color: #121212;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #08c;
+      color: white;
+    }
+    #password {
+      margin-top: 20px;
+      background: #121212;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 18px;
+      letter-spacing: 2px;
+      user-select: all;
+    }
+    #strength {
+      margin-top: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>QuickPass</h1>
+    <label for="length">Şifre Uzunluğu: <span id="lengthValue">12</span></label>
+    <input type="range" id="length" min="6" max="32" value="12" />
+
+    <label><input type="checkbox" id="lowercase" checked /> Küçük Harfler</label>
+    <label><input type="checkbox" id="uppercase" checked /> Büyük Harfler</label>
+    <label><input type="checkbox" id="numbers" checked /> Rakamlar</label>
+    <label><input type="checkbox" id="symbols" checked /> Semboller</label>
+
+    <button onclick="generatePassword()">Şifre Üret</button>
+
+    <div id="password" title="Şifreyi kopyalamak için tıklayın" onclick="copyPassword()"></div>
+    <div id="strength"></div>
+  </div>
+
+  <script>
+    const lengthSlider = document.getElementById("length");
+    const lengthValue = document.getElementById("lengthValue");
+    const passwordDisplay = document.getElementById("password");
+    const strengthDisplay = document.getElementById("strength");
+
+    lengthSlider.oninput = () => {
+      lengthValue.textContent = lengthSlider.value;
+    };
+
+    function generatePassword() {
+      const lower = "abcdefghijklmnopqrstuvwxyz";
+      const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const numbers = "0123456789";
+      const symbols = "!@#$%^&*()-_=+[]{}|;:,.<>?";
+
+      let chars = "";
+      if (document.getElementById("lowercase").checked) chars += lower;
+      if (document.getElementById("uppercase").checked) chars += upper;
+      if (document.getElementById("numbers").checked) chars += numbers;
+      if (document.getElementById("symbols").checked) chars += symbols;
+
+      if (chars.length === 0) {
+        alert("Lütfen en az bir karakter türü seçin!");
+        return;
+      }
+
+      let password = "";
+      for (let i = 0; i < lengthSlider.value; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      passwordDisplay.textContent = password;
+
+      // Şifre gücü kontrolü
+      checkStrength(password);
+    }
+
+    function checkStrength(pw) {
+      let strength = 0;
+      if (pw.length >= 8) strength++;
+      if (/[a-z]/.test(pw)) strength++;
+      if (/[A-Z]/.test(pw)) strength++;
+      if (/[0-9]/.test(pw)) strength++;
+      if (/[^a-zA-Z0-9]/.test(pw)) strength++;
+
+      switch (strength) {
+        case 5:
+          strengthDisplay.textContent = "Çok Güçlü";
+          strengthDisplay.style.color = "#0f0";
+          break;
+        case 4:
+          strengthDisplay.textContent = "Güçlü";
+          strengthDisplay.style.color = "#9acd32";
+          break;
+        case 3:
+          strengthDisplay.textContent = "Orta";
+          strengthDisplay.style.color = "#ffae42";
+          break;
+        case 2:
+          strengthDisplay.textContent = "Zayıf";
+          strengthDisplay.style.color = "#f00";
+          break;
+        default:
+          strengthDisplay.textContent = "Çok Zayıf";
+          strengthDisplay.style.color = "#a00";
+      }
+    }
+
+    function copyPassword() {
+      if (!passwordDisplay.textContent) return;
+      navigator.clipboard.writeText(passwordDisplay.textContent);
+      alert("Şifre panoya kopyalandı!");
+    }
+  </script>
+</body>
+</html>
